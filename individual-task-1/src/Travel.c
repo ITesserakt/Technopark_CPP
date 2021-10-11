@@ -14,9 +14,11 @@ Travel *new_travel(const char code[4],
   RETURN_NULL_IF_NULL(memory);
 
   memory->code = strdup(code);
-  RETURN_NULL_IF_NULL(memory->code);
-  memmove(memory->departureAirport, departureAirport, strlen(departureAirport) + 1);
-  memmove(memory->arrivalAirport, arrivalAirport, strlen(arrivalAirport) + 1);
+  FREE_RETURN_NULL(memory->code, 1, &memory);
+  memory->departureAirport = strdup(departureAirport);
+  FREE_RETURN_NULL(memory->departureAirport, 2, &memory->code, &memory);
+  memory->arrivalAirport = strdup(arrivalAirport);
+  FREE_RETURN_NULL(memory->arrivalAirport, 3, &memory->departureAirport, &memory->code, &memory);
   memory->flightDuration = flightDuration;
   memory->cost = cost;
 
@@ -34,9 +36,32 @@ void destroy_travel(Travel *travel) {
 }
 
 int compare_travels_by(Travel *lhs, Travel *rhs, int (*proj)(Travel *)) {
-  if (proj(lhs) > proj(rhs))
+  RETURN_DEFAULT_IF_NULL(lhs, -2);
+  RETURN_DEFAULT_IF_NULL(rhs, -3);
+  RETURN_DEFAULT_IF_NULL(proj, -4);
+
+  int left = proj(lhs);
+  int right = proj(rhs);
+
+  if (left > right)
     return 1;
-  else if (proj(lhs) == proj(rhs))
+  else if (left == right)
     return 0;
   return -1;
+}
+
+static int get_cost(Travel* t) {
+  return t->cost;
+}
+
+static int get_duration(Travel* t) {
+  return t->flightDuration;
+}
+
+int compare_travels_by_cost(Travel *lhs, Travel *rhs) {
+  return compare_travels_by(lhs, rhs, get_cost);
+}
+
+int compare_travels_by_duration(Travel *lhs, Travel *rhs) {
+  return compare_travels_by(lhs, rhs, get_duration);
 }

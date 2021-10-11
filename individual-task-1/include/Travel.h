@@ -17,3 +17,7 @@ Travel *new_travel(const char code[4],
 void destroy_travel(Travel *travel);
 
 int compare_travels_by(Travel *lhs, Travel *rhs, int (*proj)(Travel*));
+
+int compare_travels_by_cost(Travel* lhs, Travel* rhs);
+
+int compare_travels_by_duration(Travel* lhs, Travel* rhs);

@@ -2,4 +2,4 @@
 
 #include <stdio.h>
 
-void run(int argc, char** argv);
+char* read_line(FILE* input);
