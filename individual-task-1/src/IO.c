@@ -9,13 +9,13 @@ char *read_line(FILE *input) {
   RETURN_NULL_IF_NULL(input);
   char *result = NULL;
   size_t lastPaste = 0;
+  char *process = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+  FREE_RETURN_NULL(process, 1, &result);
 
   while (1) {
-    char *process = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-    FREE_RETURN_NULL(process, 1, &result);
-
     int err = 1 - fscanf(input, "%"AS_STRING(BUFFER_SIZE)"s", process);
     if (err != 0) {
+      fflush(input);
       free(process);
       free(result);
       return NULL;
@@ -27,7 +27,6 @@ char *read_line(FILE *input) {
     FREE_RETURN_NULL(grown, 2, &result, &process);
     result = grown;
     strcpy(result + lastPaste - word_len, process);
-    free(process);
 
     char next = (char) fgetc(input);
     if (next == '\n' || next == EOF)
@@ -37,6 +36,55 @@ char *read_line(FILE *input) {
     else
       ungetc(next, input);
   }
+  free(process);
   result[lastPaste] = '\0';
   return result;
+}
+
+char *read_word(FILE *input) {
+  RETURN_NULL_IF_NULL(input);
+  char *result = NULL;
+  size_t lastPaste = 0;
+  char *process = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+  FREE_RETURN_NULL(process, 1, &result);
+
+  while (1) {
+    int err = 1 - fscanf(input, "%"AS_STRING(BUFFER_SIZE)"s", process);
+    if (err != 0) {
+      fflush(input);
+      free(process);
+      free(result);
+      return NULL;
+    }
+
+    size_t word_len = strlen(process);
+    lastPaste += word_len;
+    char *grown = realloc(result, lastPaste + 1);
+    FREE_RETURN_NULL(grown, 2, &result, &process);
+    result = grown;
+    strcpy(result + lastPaste - word_len, process);
+
+    char next = (char) fgetc(input);
+    if (next == '\n' || next == EOF || next == ' ' || next == '\t')
+      break;
+    else
+      ungetc(next, input);
+  }
+  free(process);
+  result[lastPaste] = '\0';
+  return result;
+}
+
+int read_long(FILE *input, long *out) {
+  char *word = read_word(input), *end;
+  RETURN_DEFAULT_IF_NULL(word, READ_ERROR);
+
+  const long result = strtol(word, &end, 10);
+  if (word == end) {
+    free(word);
+    return PARSE_ERROR;
+  }
+  *out = result;
+  free(word);
+  return 0;
 }
