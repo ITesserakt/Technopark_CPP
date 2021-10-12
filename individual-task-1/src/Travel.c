@@ -3,23 +3,23 @@
 #include <string.h>
 
 Travel *new_travel(const char code[4],
-                   const char *departureAirport,
-                   const char *arrivalAirport,
-                   unsigned int flightDuration,
+                   const char *departure_airport,
+                   const char *arrival_airport,
+                   unsigned int flight_duration,
                    unsigned int cost) {
-  RETURN_NULL_IF_NULL(departureAirport);
-  RETURN_NULL_IF_NULL(arrivalAirport);
+  RETURN_NULL_IF_NULL(departure_airport);
+  RETURN_NULL_IF_NULL(arrival_airport);
 
   Travel *memory = malloc(sizeof(Travel) + 1);
   RETURN_NULL_IF_NULL(memory);
 
   memory->code = strdup(code);
   FREE_RETURN_NULL(memory->code, 1, &memory);
-  memory->departureAirport = strdup(departureAirport);
-  FREE_RETURN_NULL(memory->departureAirport, 2, &memory->code, &memory);
-  memory->arrivalAirport = strdup(arrivalAirport);
-  FREE_RETURN_NULL(memory->arrivalAirport, 3, &memory->departureAirport, &memory->code, &memory);
-  memory->flightDuration = flightDuration;
+  memory->departure_airport = strdup(departure_airport);
+  FREE_RETURN_NULL(memory->departure_airport, 2, &memory->code, &memory);
+  memory->arrival_airport = strdup(arrival_airport);
+  FREE_RETURN_NULL(memory->arrival_airport, 3, &memory->departure_airport, &memory->code, &memory);
+  memory->flight_duration = flight_duration;
   memory->cost = cost;
 
   return memory;
@@ -29,8 +29,8 @@ void destroy_travel(Travel *travel) {
   RETURN_VOID_IF_NULL(travel);
 
   free(travel->code);
-  free(travel->arrivalAirport);
-  free(travel->departureAirport);
+  free(travel->arrival_airport);
+  free(travel->departure_airport);
 
   free(travel);
 }
@@ -55,7 +55,7 @@ static int get_cost(Travel* t) {
 }
 
 static int get_duration(Travel* t) {
-  return t->flightDuration;
+  return t->flight_duration;
 }
 
 int compare_travels_by_cost(Travel *lhs, Travel *rhs) {

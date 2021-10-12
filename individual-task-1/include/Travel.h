@@ -2,16 +2,16 @@
 
 typedef struct Travel {
   char *code;
-  char *departureAirport;
-  char *arrivalAirport;
-  unsigned int flightDuration;
+  char *departure_airport;
+  char *arrival_airport;
+  unsigned int flight_duration;
   unsigned int cost;
 } Travel;
 
 Travel *new_travel(const char code[4],
-                   const char *departureAirport,
-                   const char *arrivalAirport,
-                   unsigned int flightDuration,
+                   const char *departure_airport,
+                   const char *arrival_airport,
+                   unsigned int flight_duration,
                    unsigned int cost);
 
 void destroy_travel(Travel *travel);

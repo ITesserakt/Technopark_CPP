@@ -17,9 +17,9 @@ TEST(travel, travel_creating) {
 
   EXPECT_NE(ptr, nullptr);
   EXPECT_STREQ(ptr->code, code);
-  EXPECT_STREQ(ptr->departureAirport, dep);
-  EXPECT_STREQ(ptr->arrivalAirport, arr);
-  EXPECT_EQ(ptr->flightDuration, duration);
+  EXPECT_STREQ(ptr->departure_airport, dep);
+  EXPECT_STREQ(ptr->arrival_airport, arr);
+  EXPECT_EQ(ptr->flight_duration, duration);
   EXPECT_EQ(ptr->cost, cost);
 
   destroy_travel(ptr);
