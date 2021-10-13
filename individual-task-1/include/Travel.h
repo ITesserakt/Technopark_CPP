@@ -16,11 +16,13 @@ Travel *new_travel(const char code[4],
 
 void destroy_travel(Travel *travel);
 
-typedef int (*TravelComparator)(const Travel*, const Travel*);
-typedef int (*TravelProjection)(const Travel*);
+typedef int (*TravelComparator)(const Travel *, const Travel *);
+typedef int (*TravelProjection)(const Travel *);
 
-int compare_travels_by(const Travel *lhs, const Travel *rhs, TravelProjection proj);
+int compare_travels_by(const Travel *lhs,
+                       const Travel *rhs,
+                       TravelProjection proj);
 
-int compare_travels_by_cost(const Travel* lhs, const Travel* rhs);
+int compare_travels_by_cost(const Travel *lhs, const Travel *rhs);
 
-int compare_travels_by_duration(const Travel* lhs, const Travel* rhs);
+int compare_travels_by_duration(const Travel *lhs, const Travel *rhs);

@@ -17,7 +17,7 @@ jobs:
           sudo apt install -y cppcheck valgrind
 
       - name: cpplint
-        run: cpplint --filter=-legal/copyright,-build/include_subdir --extensions=c,h,cpp individual-task-1/*/*
+        run: cpplint --filter=-legal/copyright,-build/include_subdir,-readability/casting --extensions=c,h,cpp individual-task-1/*/*
 
       - name: cppcheck
         run: cppcheck --enable=all --suppress=missingInclude individual-task-1/ main.cpp

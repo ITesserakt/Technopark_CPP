@@ -75,11 +75,11 @@ char *read_word(FILE *input) {
   return result;
 }
 
-int read_long(FILE *input, long *out) {
+int read_long(FILE *input, int64_t *out) {
   char *word = read_word(input), *end;
   RETURN_DEFAULT_IF_NULL(word, READ_ERROR);
 
-  const long result = strtol(word, &end, 10);
+  const int64_t result = strtol(word, &end, 10);
   if (word == end) {
     free(word);
     return PARSE_ERROR;

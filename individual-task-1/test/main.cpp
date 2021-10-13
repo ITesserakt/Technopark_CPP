@@ -59,7 +59,9 @@ TEST(reader, get_line) {
   FILE *test = fopen("test.txt", "w+");
   ASSERT_NE(test, nullptr);
   fprintf(test, "%s\n%s", "Hello, world!", "That's a test!");
-  fprintf(test, "\n%s\n\n", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  fprintf(test,
+          "\n%s\n\n",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   rewind(test);
 
   char *a = read_line(test);
@@ -80,7 +82,9 @@ TEST(reader, get_word) {
   FILE *test = fopen("test.txt", "w+");
   ASSERT_NE(test, nullptr);
   fprintf(test, "%s\n%s", "Hello, world!", "That's a test!");
-  fprintf(test, "\n%s\n\n", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  fprintf(test,
+          "\n%s\n\n",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   rewind(test);
 
   char *a = read_word(test);
@@ -110,7 +114,7 @@ TEST(reader, get_long) {
   fprintf(test, "\n%ld %s\n\n", 12345678910, "hmm");
   rewind(test);
 
-  long a, b, c;
+  int64_t a, b, c;
   EXPECT_EQ(read_long(test, &a), 0);
   EXPECT_EQ(read_long(test, &b), 0);
   EXPECT_EQ(read_long(test, &c), 0);
