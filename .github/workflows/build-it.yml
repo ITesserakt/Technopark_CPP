@@ -21,12 +21,7 @@ jobs:
           sudo apt install -y cppcheck
       - name: cpplint
         run: |
-          cpplint --filter=-legal/copyright,-build/include_subdir,-readability/casting,-runtime/int,-runtime/printf --extensions=c,h,cpp individual-task-${{matrix.task}}/*/*
-        # copyright - не нужен
-        # include_subdir - не понял к чему это он
-        # casting - почему он предлагает юзать плюсовые операции??
-        # int - баги с компиляцией
-        # printf - удобнее использовать strcpy, а не snprintf
+          cpplint individual-task-${{matrix.task}}/*/*
 
       - name: cppcheck
         run: cppcheck --enable=all --suppress=missingInclude individual-task-${{matrix.task}}/ main.cpp

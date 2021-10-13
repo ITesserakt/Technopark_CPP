@@ -9,14 +9,12 @@ char *read_line(FILE *input) {
   RETURN_NULL_IF_NULL(input);
   char *result = NULL;
   size_t lastPaste = 0;
-  char *process = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-  FREE_RETURN_NULL(process, 1, &result);
+  char process[BUFFER_SIZE];
 
   while (1) {
     int err = 1 - fscanf(input, "%"AS_STRING(BUFFER_SIZE)"s", process);
     if (err != 0) {
       fflush(input);
-      free(process);
       free(result);
       return NULL;
     }
@@ -36,7 +34,6 @@ char *read_line(FILE *input) {
     else
       ungetc(next, input);
   }
-  free(process);
   result[lastPaste] = '\0';
   return result;
 }
@@ -45,14 +42,12 @@ char *read_word(FILE *input) {
   RETURN_NULL_IF_NULL(input);
   char *result = NULL;
   size_t lastPaste = 0;
-  char *process = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-  FREE_RETURN_NULL(process, 1, &result);
+  char process[BUFFER_SIZE];
 
   while (1) {
     int err = 1 - fscanf(input, "%"AS_STRING(BUFFER_SIZE)"s", process);
     if (err != 0) {
       fflush(input);
-      free(process);
       free(result);
       return NULL;
     }
@@ -70,7 +65,6 @@ char *read_word(FILE *input) {
     else
       ungetc(next, input);
   }
-  free(process);
   result[lastPaste] = '\0';
   return result;
 }
