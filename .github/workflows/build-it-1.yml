@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@2
+      - uses: actions/checkout@v2
 
       - name: install_deps
         run: |
@@ -41,7 +41,7 @@ jobs:
           valgrind --tool=memcheck --leak-check=yes --log-file=../valgrind-report/report.txt ./individual-task-1/it-1-test
 
       - name: upload artifacts
-        uses: actions/upload-artifact@2
+        uses: actions/upload-artifact@v2
         with:
           name: valgrind report
           path: valgrind-report/
