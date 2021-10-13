@@ -18,7 +18,7 @@ jobs:
       - name: install deps
         run: |
           pip install cpplint
-          sudo apt install -y cppcheck valgrind
+          sudo apt install -y cppcheck
       - name: cpplint
         run: |
           cpplint --filter=-legal/copyright,-build/include_subdir,-readability/casting,-runtime/int,-runtime/printf --extensions=c,h,cpp individual-task-${{matrix.task}}/*/*
@@ -38,6 +38,9 @@ jobs:
         task: [ 1 ]
     steps:
       - uses: actions/checkout@v2
+
+      - name: install deps
+        run: sudo apt install -y valgrind gcovr
 
       - name: cmake
         run: |
