@@ -49,6 +49,12 @@ jobs:
       - name: test
         run: cd build && ./individual-task-${{matrix.task}}/it-${{matrix.task}}-test
 
+      - name: coverage
+        run: |
+          mkdir coverage-report
+          cd coverage-report
+          gcovr -r ../ --html --html-details --filter ../individual-task-${{matrix.task}}/ -o coverage-report.html
+
       - name: valgrind
         run: |
           mkdir valgrind-report
@@ -58,5 +64,7 @@ jobs:
       - name: upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: valgrind report
-          path: valgrind-report/
+          name: test report
+          path: |
+            valgrind-report/
+            coverage-report/
