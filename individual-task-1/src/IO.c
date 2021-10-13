@@ -26,7 +26,7 @@ char *read_line(FILE *input) {
     char *grown = realloc(result, lastPaste + 1);
     FREE_RETURN_NULL(grown, 2, &result, &process);
     result = grown;
-    snprintf(result + lastPaste - word_len, word_len, "%s", process);
+    strcpy(result + lastPaste - word_len, process);
 
     char next = (char) fgetc(input);
     if (next == '\n' || next == EOF)
@@ -62,7 +62,7 @@ char *read_word(FILE *input) {
     char *grown = realloc(result, lastPaste + 1);
     FREE_RETURN_NULL(grown, 2, &result, &process);
     result = grown;
-    snprintf(result + lastPaste - word_len, word_len, "%s", process);
+    strcpy(result + lastPaste - word_len, process);
 
     char next = (char) fgetc(input);
     if (next == '\n' || next == EOF || next == ' ' || next == '\t')
@@ -75,11 +75,11 @@ char *read_word(FILE *input) {
   return result;
 }
 
-int read_long(FILE *input, int64_t *out) {
+int read_long(FILE *input, long *out) {
   char *word = read_word(input), *end;
   RETURN_DEFAULT_IF_NULL(word, READ_ERROR);
 
-  const int64_t result = strtol(word, &end, 10);
+  const long result = strtol(word, &end, 10);
   if (word == end) {
     free(word);
     return PARSE_ERROR;

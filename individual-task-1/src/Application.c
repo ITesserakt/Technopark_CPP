@@ -57,7 +57,7 @@ Travel *load_travel(FILE *input, FILE *output) {
   }
 
   prompt(output, "Enter flight duration in minutes: ");
-  int64_t dur;
+  long dur;
   if (read_long(input, &dur) != 0) {
     if (!feof(input))
       printf("Incorrect flight duration\n");
@@ -65,7 +65,7 @@ Travel *load_travel(FILE *input, FILE *output) {
   }
 
   prompt(output, "Enter flight cost: ");
-  int64_t cost;
+  long cost;
   if (read_long(input, &cost) != 0) {
     if (!feof(input))
       printf("Incorrect travel cost\n");
@@ -82,7 +82,7 @@ const Travel **load_travels(FILE *input, FILE *output, size_t *length) {
   RETURN_NULL_IF_NULL(output);
   RETURN_NULL_IF_NULL(length);
 
-  size_t travels_capacity = 2;
+  size_t travels_capacity = BUFFER_SIZE;
   const Travel **travels = malloc(travels_capacity * sizeof(Travel **));
   RETURN_NULL_IF_NULL(travels);
 
@@ -152,7 +152,7 @@ int run(int argc, char **argv) {
       comparators[] = {compare_travels_by_duration, compare_travels_by_cost};
 
   printf("Find minimum travel by duration (0) or by cost (1): ");
-  int64_t choice;
+  long choice;
   while (read_long(stdin, &choice) != 0 || !(choice == 0 || choice == 1))
     show_error(stdout);
 

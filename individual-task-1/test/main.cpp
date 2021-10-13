@@ -114,7 +114,7 @@ TEST(reader, get_long) {
   fprintf(test, "\n%ld %s\n\n", 12345678910, "hmm");
   rewind(test);
 
-  int64_t a, b, c;
+  long a, b, c;
   EXPECT_EQ(read_long(test, &a), 0);
   EXPECT_EQ(read_long(test, &b), 0);
   EXPECT_EQ(read_long(test, &c), 0);

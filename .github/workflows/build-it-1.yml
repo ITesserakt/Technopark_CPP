@@ -17,7 +17,12 @@ jobs:
           sudo apt install -y cppcheck valgrind
 
       - name: cpplint
-        run: cpplint --filter=-legal/copyright,-build/include_subdir,-readability/casting --extensions=c,h,cpp individual-task-1/*/*
+        run: cpplint --filter=-legal/copyright,-build/include_subdir,-readability/casting,-runtime/int,-runtime/printf --extensions=c,h,cpp individual-task-1/*/*
+        # copyright - а зачем?
+        # include_subdir - не удобно
+        # casting - почему он предлагает юзать плюсовые операции??
+        # int - баги с компиляцией
+        # printf - удобнее использовать strcpy, а не snprintf
 
       - name: cppcheck
         run: cppcheck --enable=all --suppress=missingInclude individual-task-1/ main.cpp
