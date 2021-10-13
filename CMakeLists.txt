@@ -12,7 +12,7 @@ add_executable(main main.cpp)
 
 target_compile_options(main PRIVATE -Wall -Wextra -Werror)
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    target_compile_definitions(main PRIVATE DEBUG)
+    add_compile_definitions(DEBUG)
 endif ()
 
 add_subdirectory(individual-task-${CURRENT_TASK})

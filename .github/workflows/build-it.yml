@@ -1,0 +1,64 @@
+name: build-it
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request: null
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        task: [ 1 ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install deps
+        run: |
+          pip install cpplint
+          sudo apt install -y cppcheck valgrind
+      - name: cpplint
+        run: |
+          cpplint --filter=-legal/copyright,-build/include_subdir,-readability/casting,-runtime/int,-runtime/printf --extensions=c,h,cpp individual-task-${{matrix.task}}/*/*
+        # copyright - не нужен
+        # include_subdir - не понял к чему это он
+        # casting - почему он предлагает юзать плюсовые операции??
+        # int - баги с компиляцией
+        # printf - удобнее использовать strcpy, а не snprintf
+
+      - name: cppcheck
+        run: cppcheck --enable=all --suppress=missingInclude individual-task-${{matrix.task}}/ main.cpp
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        task: [ 1 ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: cmake
+        run: |
+          mkdir build
+          cd build
+          cmake -B . -S .. -DCMAKE_BUILD_TYPE=Debug -DCURRENT_TASK=${{matrix.task}}
+
+      - name: build
+        run: cd build && make main it-${{matrix.task}}-test
+
+      - name: test
+        run: cd build && ./individual-task-${{matrix.task}}/it-${{matrix.task}}-test
+
+      - name: valgrind
+        run: |
+          mkdir valgrind-report
+          cd build
+          valgrind --tool=memcheck --leak-check=yes --log-file=../valgrind-report/report.txt ./individual-task-${{matrix.task}}/it-${{matrix.task}}-test
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: valgrind report
+          path: valgrind-report/
