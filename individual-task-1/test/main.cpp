@@ -56,14 +56,12 @@ TEST(travel, wrong_travel) {
 }
 
 TEST(reader, get_line) {
-  FILE *test = fopen("test.txt", "w");
+  FILE *test = fopen("test.txt", "w+");
   ASSERT_NE(test, nullptr);
   fprintf(test, "%s\n%s", "Hello, world!", "That's a test!");
   fprintf(test, "\n%s\n\n", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-  fclose(test);
+  rewind(test);
 
-  test = fopen("test.txt", "r");
-  ASSERT_NE(test, nullptr);
   char *a = read_line(test);
   char *b = read_line(test);
   char *c = read_line(test);
@@ -79,14 +77,12 @@ TEST(reader, get_line) {
 }
 
 TEST(reader, get_word) {
-  FILE *test = fopen("test.txt", "w");
+  FILE *test = fopen("test.txt", "w+");
   ASSERT_NE(test, nullptr);
   fprintf(test, "%s\n%s", "Hello, world!", "That's a test!");
   fprintf(test, "\n%s\n\n", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-  fclose(test);
+  rewind(test);
 
-  test = fopen("test.txt", "r");
-  ASSERT_NE(test, nullptr);
   char *a = read_word(test);
   char *b = read_word(test);
   char *c = read_word(test);
@@ -108,14 +104,12 @@ TEST(reader, get_word) {
 }
 
 TEST(reader, get_long) {
-  FILE *test = fopen("test.txt", "w");
+  FILE *test = fopen("test.txt", "w+");
   ASSERT_NE(test, nullptr);
   fprintf(test, "%d\n%d", 1, 2);
   fprintf(test, "\n%ld %s\n\n", 12345678910, "hmm");
-  fclose(test);
+  rewind(test);
 
-  test = fopen("test.txt", "r");
-  ASSERT_NE(test, nullptr);
   long a, b, c;
   EXPECT_EQ(read_long(test, &a), 0);
   EXPECT_EQ(read_long(test, &b), 0);
@@ -127,13 +121,6 @@ TEST(reader, get_long) {
   EXPECT_EQ(a, 1);
   EXPECT_EQ(b, 2);
   EXPECT_EQ(c, 12345678910);
-}
-
-TEST(app, no_throw) {
-  ASSERT_NO_THROW({
-                    char **argv = {nullptr};
-                    run(0, argv);
-                  });
 }
 
 TEST(utils, multiple_free) {

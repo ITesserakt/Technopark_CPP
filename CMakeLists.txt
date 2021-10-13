@@ -8,6 +8,11 @@ include(InstallLibraries.cmake)
 
 add_executable(main main.cpp)
 
+target_compile_options(main PRIVATE -Wall -Wextra -Werror)
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    target_compile_definitions(main PRIVATE DEBUG)
+endif ()
+
 add_subdirectory(individual-task-${CURRENT_TASK})
 
 target_include_directories(main PRIVATE individual-task-${CURRENT_TASK}/include)

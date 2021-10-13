@@ -3,77 +3,178 @@
 #include "IO.h"
 #include "utils.h"
 
+#define BUFFER_SIZE 4
+#define GROW_RATIO 2
+
 static void prompt(FILE *output, const char *message) {
-  if (output == NULL || message == NULL)
-    return;
+  RETURN_VOID_IF_NULL(output);
+  RETURN_VOID_IF_NULL(message);
+
   if (output == stdout)
     fprintf(output, "%s", message);
 }
 
 static void show_error(FILE *output) {
-  if (output == NULL)
-    return;
-  if (output == stdout)
-    prompt(output, "Incorrect. Please repeat: ");
+  RETURN_VOID_IF_NULL(output);
+  prompt(output, "Incorrect. Please repeat: ");
 }
 
-Travel *loadTravel(FILE *input, FILE *output) {
+static void choose_load_method(FILE **in, FILE **out) {
+  printf("Specify file to load travels table from: ");
+  char *filename;
+  while ((filename = read_line(stdin)) == NULL
+      || (*in = fopen(filename, "r")) == NULL)
+    show_error(stdout);
+  free(filename);
+  *out = *in;
+}
+
+Travel *load_travel(FILE *input, FILE *output) {
   RETURN_NULL_IF_NULL(input);
   RETURN_NULL_IF_NULL(output);
   prompt(output, "Enter travel code (e.g. SVO): ");
   char *code;
-  while ((code = read_line(input)) == NULL || strlen(code) != 3)
-    show_error(output);
+  if ((code = read_line(input)) == NULL || strlen(code) != 3) {
+    if (!feof(input))
+      printf("Incorrect travel code\n");
+    FREE_RETURN_NULL(NULL, 1, &code);
+  }
 
   prompt(output, "Enter departure airport: ");
   char *dep;
-  while ((dep = read_line(input)) == NULL)
-    show_error(output);
+  if ((dep = read_line(input)) == NULL) {
+    if (!feof(input))
+      printf("Incorrect departure airport\n");
+    FREE_RETURN_NULL(NULL, 2, &code, &dep);
+  }
 
   prompt(output, "Enter arrival airport: ");
   char *arr;
-  while ((arr = read_line(input)) == NULL)
-    show_error(output);
+  if ((arr = read_line(input)) == NULL) {
+    if (!feof(input))
+      printf("Incorrect arrival airport");
+    FREE_RETURN_NULL(NULL, 3, &code, &dep, &arr);
+  }
 
   prompt(output, "Enter flight duration in minutes: ");
   long dur;
-  while (read_long(input, &dur) != 0)
-    show_error(output);
+  if (read_long(input, &dur) != 0) {
+    if (!feof(input))
+      printf("Incorrect flight duration\n");
+    FREE_RETURN_NULL(NULL, 3, &code, &dep, &arr);
+  }
 
   prompt(output, "Enter flight cost: ");
   long cost;
-  while (read_long(input, &cost) != 0)
-    show_error(output);
+  if (read_long(input, &cost) != 0) {
+    if (!feof(input))
+      printf("Incorrect travel cost\n");
+    FREE_RETURN_NULL(NULL, 3, &code, &dep, &arr);
+  }
 
   Travel *result = new_travel(code, dep, arr, dur, cost);
   free_many(3, &code, &dep, &arr);
   return result;
 }
 
-void run(int argc, char **argv) {
-  printf("Hello! Please choose a method to load travels table:\n"
-         "    1 - from console, 2 - from file\n");
-  long choice;
-  while (read_long(stdin, &choice) != 0 || !(choice == 1 || choice == 2))
+const Travel **load_travels(FILE *input, FILE *output, size_t *length) {
+  RETURN_NULL_IF_NULL(input);
+  RETURN_NULL_IF_NULL(output);
+  RETURN_NULL_IF_NULL(length);
+
+  size_t travels_capacity = 2;
+  const Travel **travels = malloc(travels_capacity * sizeof(Travel **));
+  RETURN_NULL_IF_NULL(travels);
+
+  const Travel *next;
+  while ((next = load_travel(input, output)) != NULL) {
+    if (travels_capacity == *length) {
+      const Travel **grown = realloc(travels, travels_capacity *= GROW_RATIO);
+      if (grown == NULL) {
+        printf("Error while allocating memory, aborting...\n");
+        FREE_RETURN_NULL(grown, 2, &travels, &next);
+      }
+      travels = grown;
+    }
+    travels[(*length)++] = next;
+  }
+  fflush(input);
+  return travels;
+}
+
+const Travel *find_min_by(const Travel **travels,
+                          size_t length,
+                          char *from,
+                          char *to,
+                          TravelComparator comparator) {
+  RETURN_NULL_IF_NULL(travels);
+  RETURN_NULL_IF_NULL(from);
+  RETURN_NULL_IF_NULL(to);
+  RETURN_NULL_IF_NULL(comparator);
+  if (length == 0)
+    return NULL;
+
+  const Travel *minimum = NULL;
+  for (int i = 0; i < length; i++) {
+    const Travel *travel = travels[i];
+    if (strcmp(travel->departure_airport, from) == 0
+        && strcmp(travel->arrival_airport, to) == 0
+        && comparator(minimum, travel) == -1)
+      minimum = travel;
+  }
+  return minimum;
+}
+
+int run(int argc, char **argv) {
+  FILE *in;
+  FILE *out;
+
+  choose_load_method(&in, &out);
+  size_t travels_length = 0;
+  const Travel **travels = load_travels(in, out, &travels_length);
+  if (travels == NULL) {
+    if (in != stdin)
+      fclose(in);
+    printf("Could not load travels properly\n");
+    RETURN_DEFAULT_IF_NULL(travels, 1);
+  }
+
+  printf("Select from airport: ");
+  char *from;
+  while ((from = read_line(stdin)) == NULL)
     show_error(stdout);
 
-  FILE *file;
-  FILE *out;
-  if (choice == 1) {
-    printf("Ok, let's load your travels...\n");
-    file = stdin;
-    out = stdout;
-  } else {
-    printf("Specify file to load from: ");
-    char *filename;
-    while ((filename = read_line(stdin)) == NULL || (file = fopen(filename, "r")) == NULL)
-      show_error(stdout);
-    out = file;
-  }
+  printf("Select to airport: ");
+  char *to;
+  while ((to = read_line(stdin)) == NULL)
+    show_error(stdout);
+  TravelComparator
+      comparators[] = {compare_travels_by_duration, compare_travels_by_cost};
 
-  loadTravel(file, out);
-  if (file != stdin) {
-    fclose(file);
-    fclose(out);
-  }
+  printf("Find minimum travel by duration (0) or by cost (1): ");
+  long choice;
+  while (read_long(stdin, &choice) != 0 || !(choice == 0 || choice == 1))
+    show_error(stdout);
+
+  const Travel *min =
+      find_min_by(travels, travels_length, from, to, comparators[choice]);
+  if (min == NULL)
+    printf("Not found viable travel\n");
+  else
+    printf(
+        "Travel { code: %s, departure airport: %s, arrival airport: %s, "
+        "flight duration: %u, cost: %u }\n",
+        min->code,
+        min->departure_airport,
+        min->arrival_airport,
+        min->flight_duration,
+        min->cost);
+
+  for (int i = 0; i < travels_length; i++)
+    destroy_travel((Travel *) travels[i]);
+  free_many(3, &travels, &from, &to);
+  if (in != stdin)
+    fclose(in);
+
+  return 0;
 }

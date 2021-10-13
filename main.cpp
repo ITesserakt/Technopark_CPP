@@ -3,5 +3,5 @@ extern "C" {
 }
 
 int main(int argc, char **argv) {
-  run(argc, argv);
+  return run(argc, argv);
 }

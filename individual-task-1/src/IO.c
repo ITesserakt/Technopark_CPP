@@ -26,7 +26,7 @@ char *read_line(FILE *input) {
     char *grown = realloc(result, lastPaste + 1);
     FREE_RETURN_NULL(grown, 2, &result, &process);
     result = grown;
-    strcpy(result + lastPaste - word_len, process);
+    snprintf(result + lastPaste - word_len, word_len, "%s", process);
 
     char next = (char) fgetc(input);
     if (next == '\n' || next == EOF)
@@ -62,7 +62,7 @@ char *read_word(FILE *input) {
     char *grown = realloc(result, lastPaste + 1);
     FREE_RETURN_NULL(grown, 2, &result, &process);
     result = grown;
-    strcpy(result + lastPaste - word_len, process);
+    snprintf(result + lastPaste - word_len, word_len, "%s", process);
 
     char next = (char) fgetc(input);
     if (next == '\n' || next == EOF || next == ' ' || next == '\t')

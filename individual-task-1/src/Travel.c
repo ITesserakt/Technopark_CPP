@@ -1,6 +1,6 @@
+#include <string.h>
 #include "Travel.h"
 #include "utils.h"
-#include <string.h>
 
 Travel *new_travel(const char code[4],
                    const char *departure_airport,
@@ -18,7 +18,11 @@ Travel *new_travel(const char code[4],
   memory->departure_airport = strdup(departure_airport);
   FREE_RETURN_NULL(memory->departure_airport, 2, &memory->code, &memory);
   memory->arrival_airport = strdup(arrival_airport);
-  FREE_RETURN_NULL(memory->arrival_airport, 3, &memory->departure_airport, &memory->code, &memory);
+  FREE_RETURN_NULL(memory->arrival_airport,
+                   3,
+                   &memory->departure_airport,
+                   &memory->code,
+                   &memory);
   memory->flight_duration = flight_duration;
   memory->cost = cost;
 
@@ -35,7 +39,9 @@ void destroy_travel(Travel *travel) {
   free(travel);
 }
 
-int compare_travels_by(Travel *lhs, Travel *rhs, int (*proj)(Travel *)) {
+int compare_travels_by(const Travel *lhs,
+                       const Travel *rhs,
+                       TravelProjection proj) {
   RETURN_DEFAULT_IF_NULL(lhs, -2);
   RETURN_DEFAULT_IF_NULL(rhs, -3);
   RETURN_DEFAULT_IF_NULL(proj, -4);
@@ -50,18 +56,18 @@ int compare_travels_by(Travel *lhs, Travel *rhs, int (*proj)(Travel *)) {
   return -1;
 }
 
-static int get_cost(Travel* t) {
+static int get_cost(const Travel *t) {
   return t->cost;
 }
 
-static int get_duration(Travel* t) {
+static int get_duration(const Travel *t) {
   return t->flight_duration;
 }
 
-int compare_travels_by_cost(Travel *lhs, Travel *rhs) {
+int compare_travels_by_cost(const Travel *lhs, const Travel *rhs) {
   return compare_travels_by(lhs, rhs, get_cost);
 }
 
-int compare_travels_by_duration(Travel *lhs, Travel *rhs) {
+int compare_travels_by_duration(const Travel *lhs, const Travel *rhs) {
   return compare_travels_by(lhs, rhs, get_duration);
 }
