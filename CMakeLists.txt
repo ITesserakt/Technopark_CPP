@@ -3,10 +3,19 @@ project(Technopark_CPP)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
-set(CURRENT_TASK 1)
+if (NOT CURRENT_TASK)
+    set(CURRENT_TASK 1)
+endif ()
 include(InstallLibraries.cmake)
 
 add_executable(main main.cpp)
+
+target_compile_options(main PRIVATE -Wall -Wextra -Werror)
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
+    add_compile_definitions(DEBUG)
+endif ()
 
 add_subdirectory(individual-task-${CURRENT_TASK})
 

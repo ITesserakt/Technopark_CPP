@@ -1,0 +1,70 @@
+name: build-it
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request: null
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        task: [ 1 ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install deps
+        run: |
+          pip install cpplint
+          sudo apt install -y cppcheck
+      - name: cpplint
+        run: |
+          cpplint individual-task-${{matrix.task}}/*/*
+
+      - name: cppcheck
+        run: cppcheck --enable=all --suppress=missingInclude individual-task-${{matrix.task}}/ main.cpp
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        task: [ 1 ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install deps
+        run: sudo apt install -y valgrind gcovr
+
+      - name: cmake
+        run: |
+          mkdir build
+          cd build
+          cmake -B . -S .. -DCMAKE_BUILD_TYPE=Debug -DCURRENT_TASK=${{matrix.task}}
+
+      - name: build
+        run: cd build && make main it-${{matrix.task}}-test
+
+      - name: test
+        run: cd build && ./individual-task-${{matrix.task}}/it-${{matrix.task}}-test
+
+      - name: coverage
+        run: |
+          mkdir coverage-report
+          cd coverage-report
+          gcovr -r ../ --html --html-details --filter ../individual-task-${{matrix.task}}/ -o coverage-report.html
+
+      - name: valgrind
+        run: |
+          mkdir valgrind-report
+          cd build
+          valgrind --tool=memcheck --leak-check=yes --log-file=../valgrind-report/report.txt ./individual-task-${{matrix.task}}/it-${{matrix.task}}-test
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: test report
+          path: |
+            valgrind-report/
+            coverage-report/

@@ -2,4 +2,10 @@
 
 #include <stdio.h>
 
-void run(FILE* input, FILE* output, int argc, char** argv);
+#include "Travel.h"
+
+int run(int argc, const char **argv);
+
+Travel *load_travel(FILE *input, FILE *output);
+
+const Travel **load_travels(FILE *input, FILE *output, size_t *length);
